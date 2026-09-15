@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0c8a62">
+  <meta name="description" content="AURUM Signal — интерактивный прототип цифрового гибридного аукциона">
+  <title>AURUM Signal — цифровой аукцион</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230c8a62'/%3E%3Cpath d='M9 8h14v4H9zm5 4h4v8h-4zM8 20h16v4H8z' fill='white'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <header class="topbar">
+      <button class="brand" data-route="discover" aria-label="AURUM — на главную">
+        <span class="brand-mark" aria-hidden="true">A</span>
+        <span>AURUM <small>signal</small></span>
+      </button>
+
+      <nav class="desktop-nav" aria-label="Главная навигация">
+        <button data-route="discover">Обзор</button>
+        <button data-route="catalog">Лоты</button>
+        <button data-route="live"><i class="live-dot"></i>Live-зал</button>
+        <button data-route="how">Как участвовать</button>
+      </nav>
+
+      <div class="top-actions">
+        <button class="icon-button" id="searchButton" aria-label="Поиск"></button>
+        <button class="icon-button has-badge" id="notificationButton" aria-label="Уведомления"></button>
+        <button class="profile-pill" data-route="investor">
+          <span class="avatar">АК</span>
+          <span><small>Верифицирован</small>Айдар К.</span>
+        </button>
+        <button class="mobile-menu" id="menuButton" aria-label="Открыть меню"></button>
+      </div>
+    </header>
+
+    <div class="connection-strip">
+      <span><i class="status-dot"></i> Соединение защищено</span>
+      <span class="mono">PING <b id="pingValue">12 ms</b></span>
+      <span class="server-time">Время сервера <b id="serverTime">00:00:00</b></span>
+      <button id="freezeDemo">Демо SLA Freeze</button>
+    </div>
+
+    <aside class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+      <button data-route="discover">Обзор</button>
+      <button data-route="catalog">Все лоты</button>
+      <button data-route="live">Live-зал</button>
+      <button data-route="investor">Кабинет инвестора</button>
+      <button data-route="seller">Кабинет продавца</button>
+      <button data-route="partner">Кабинет партнёра</button>
+    </aside>
+
+    <main id="page" tabindex="-1"></main>
+
+    <footer>
+      <div class="brand footer-brand"><span class="brand-mark">A</span><span>AURUM <small>signal</small></span></div>
+      <p>Цифровой гибридный аукцион скоростных продаж</p>
+      <div><a href="#how">Правила</a><a href="#how">Безопасность</a><span>© 2026</span></div>
+    </footer>
+  </div>
+
+  <dialog id="bidDialog" class="modal bid-modal">
+    <form method="dialog">
+      <button class="modal-close" value="cancel" aria-label="Закрыть">×</button>
+      <div class="modal-icon" id="bidModalIcon"></div>
+      <span class="kicker">Подтверждение ставки</span>
+      <h2>Повысить цену на 3%?</h2>
+      <div class="confirm-prices">
+        <div><small>Текущая цена</small><strong id="confirmCurrent">—</strong></div>
+        <span>→</span>
+        <div><small>Ваша ставка</small><strong id="confirmNext">—</strong></div>
+      </div>
+      <p>После подтверждения ставка фиксируется в протоколе торгов и таймер возвращается к 00:50.</p>
+      <label class="confirm-check"><input type="checkbox" id="termsCheck"> <span>Я подтверждаю сумму и понимаю правила торгов</span></label>
+      <menu><button value="cancel" class="button ghost">Отмена</button><button type="button" id="confirmBid" class="button primary" disabled>Подтвердить ставку</button></menu>
+    </form>
+  </dialog>
+
+  <dialog id="runnerDialog" class="modal runner-modal">
+    <form method="dialog">
+      <button class="modal-close" value="cancel" aria-label="Закрыть">×</button>
+      <span class="rank">#2</span><span class="kicker">Runner-Up Option</span>
+      <h2>Вы заняли второе место</h2>
+      <p>Выберите, что сделать с гарантийным задатком.</p>
+      <button value="keep" class="runner-option"><b>Опция A</b><span>Сохранить задаток на 5 дней</span><small>Вы получите право выкупа, если победитель откажется.</small></button>
+      <button value="refund" class="runner-option"><b>Опция Б</b><span>Вернуть 100% задатка</span><small>Возврат будет запущен в течение 24 часов.</small></button>
+    </form>
+  </dialog>
+
+  <dialog id="searchDialog" class="modal search-modal">
+    <form method="dialog">
+      <label><span id="searchIcon"></span><input id="globalSearch" autofocus placeholder="Название, номер лота, категория..."></label>
+      <button value="cancel" class="modal-close" aria-label="Закрыть">×</button>
+      <div id="searchResults" class="search-results"></div>
+    </form>
+  </dialog>
+
+  <div id="freezeOverlay" class="freeze-overlay" hidden>
+    <div class="freeze-card"><span id="wifiOffIcon"></span><small>SLA FREEZE</small><h2>Сетевая пауза</h2><p>Таймер торгов заморожен. Система синхронизирует участников и автоматически продолжит торги.</p><strong id="freezeCountdown">00:10</strong></div>
+  </div>
+
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
